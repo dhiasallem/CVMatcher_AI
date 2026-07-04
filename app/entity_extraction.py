@@ -56,25 +56,32 @@ def compare_skills(cv_skills: list[str], offre_skills: list[str]) -> tuple[list[
     return communes, manquantes
 
 
+import os
+from extractor import extract_text, clean_text
+
 if __name__ == "__main__":
-    cv_exemple = """
-    Jean Dupont - Développeur Web
-    Expérience : 3 ans chez WebCorp en tant que développeur front-end.
-    Compétences : HTML, CSS, JavaScript, Python, React, Git.
-    """
+    dossier = "data/sample_cvs"
+    fichiers_pdf = [f for f in os.listdir(dossier) if f.endswith(".pdf")]
 
-    offre_exemple = """
-    Recherche développeur front-end expérimenté.
-    Compétences requises : JavaScript, React, HTML, CSS, TypeScript, Docker.
-    Une expérience en Python est un plus.
-    """
+    if not fichiers_pdf:
+        print(f"Aucun fichier PDF trouvé dans {dossier}/")
+    else:
+        sample_path = os.path.join(dossier, fichiers_pdf[0])
+        raw_text = extract_text(sample_path)
+        cv_texte = clean_text(raw_text)
 
-    cv_skills = extract_skills(cv_exemple)
-    offre_skills = extract_skills(offre_exemple)
+        offre_exemple = """
+        Recherche développeur front-end expérimenté.
+        Compétences requises : JavaScript, React, HTML, CSS, TypeScript, Docker.
+        Une expérience en Python est un plus.
+        """
 
-    print("Compétences détectées dans le CV :", cv_skills)
-    print("Compétences détectées dans l'offre :", offre_skills)
+        cv_skills = extract_skills(cv_texte)
+        offre_skills = extract_skills(offre_exemple)
 
-    communes, manquantes = compare_skills(cv_skills, offre_skills)
-    print("\n✅ Compétences en commun :", communes)
-    print("❌ Compétences manquantes :", manquantes)
+        print("Compétences détectées dans le CV :", cv_skills)
+        print("Compétences détectées dans l'offre :", offre_skills)
+
+        communes, manquantes = compare_skills(cv_skills, offre_skills)
+        print("\n✅ Compétences en commun :", communes)
+        print("❌ Compétences manquantes :", manquantes)
